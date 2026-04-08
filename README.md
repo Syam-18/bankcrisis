@@ -1,27 +1,3 @@
-# Bankcrisis OpenEnv Environment
-
-This project implements a custom OpenEnv-compatible environment exposed via a FastAPI server and deployed using Docker.
-
-## 🔗 Links
-
-* **GitHub Repository**: https://github.com/Syam-18/bankcrisis
-* **Hugging Face Space**: https://huggingface.co/spaces/Sk8erBoi369/bankcrisis
-
-## ✅ Validation Status
-
-* Docker build: ✅ Passed
-* Hugging Face deployment: ✅ Live
-* OpenEnv validation: ✅ Passed (3/3 checks)
-
----
-
-
-
-
-
-
-
-
 ---
 title: Bankcrisis Environment Server
 emoji: ☎️
