@@ -1,0 +1,68 @@
+spec_version: 1
+name: bankcrisis
+version: "1.0.0"
+description: >
+  A macroeconomic policy environment where an agent controls interest rates, QE, 
+  and forward guidance to stabilize inflation, unemployment, GDP growth, and financial stress.
+  Three tasks are available: (1) Inflation Control (easy), (2) Dual Mandate (medium), 
+  (3) Crisis Stabilization (hard).
+type: space
+runtime: fastapi
+app: server.app:app
+port: 8000
+
+tasks:
+  - id: 1
+    name: "Mild Overheating"
+  - id: 2
+    name: "Stagflation"
+  - id: 3
+    name: "Liquidity Crisis"
+
+actions:
+  - name: rate_change
+    description: Change in policy interest rate (basis points)
+    schema:
+      type: integer
+      enum: [-25, 0, 25]
+      default: 0
+  - name: qe_amount
+    description: Quantitative Easing amount (in billions)
+    schema:
+      type: number
+      enum: [0.0, 10.0, 20.0]
+      default: 0.0
+  - name: guidance
+    description: Central bank forward guidance policy
+    schema:
+      type: string
+      enum: ["hawkish", "neutral", "dovish"]
+      default: "neutral"
+
+observations:
+  - name: text
+    description: Textual summary of the current economic state and pending policy effects.
+    schema:
+      type: string
+
+  - name: state
+    description: Raw economic state variables (inflation, unemployment, gdp_growth, interest_rate, market_stress, step).
+    schema:
+      type: object
+      additionalProperties: true
+
+  - name: info
+    description: Additional environment info including metadata and diagnostics.
+    schema:
+      type: object
+      additionalProperties: true
+
+  - name: reward
+    description: Reward obtained after the last action.
+    schema:
+      type: number
+
+  - name: done
+    description: Whether the episode has terminated.
+    schema:
+      type: boolean
