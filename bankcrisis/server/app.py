@@ -36,7 +36,7 @@ except Exception as e:  # pragma: no cover
     ) from e
 
 from bankcrisis.models import BankcrisisAction, BankcrisisObservation
-from server.bankcrisis_environment import BankcrisisEnvironment
+from bankcrisis.server.bankcrisis_environment import BankcrisisEnvironment
 
 import sys
 import os
