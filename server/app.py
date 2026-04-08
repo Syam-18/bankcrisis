@@ -1,0 +1,1 @@
+from bankcrisis.server.app import app, main
