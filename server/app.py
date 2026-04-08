@@ -38,6 +38,10 @@ except Exception as e:  # pragma: no cover
 from models import BankcrisisAction, BankcrisisObservation
 from server.bankcrisis_environment import BankcrisisEnvironment
 
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Create the app with web interface and README integration
 app = create_app(
