@@ -35,7 +35,7 @@ except Exception as e:  # pragma: no cover
         "openenv is required for the web interface. Install dependencies with '\n    uv sync\n'"
     ) from e
 
-from models import BankcrisisAction, BankcrisisObservation
+from bankcrisis.models import BankcrisisAction, BankcrisisObservation
 from server.bankcrisis_environment import BankcrisisEnvironment
 
 import sys

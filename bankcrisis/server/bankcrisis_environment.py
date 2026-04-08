@@ -17,10 +17,8 @@ from openenv.core.env_server.interfaces import Environment
 from openenv.core.env_server.types import State
 from .scenarios import SCENARIOS
 from .grading import grade
-try:
-    from ..models import BankcrisisAction, BankcrisisObservation, BankcrisisState
-except ImportError:
-    from models import BankcrisisAction, BankcrisisObservation, BankcrisisState
+
+from bankcrisis.models import BankcrisisAction, BankcrisisObservation, BankcrisisState
 
 MAX_STEPS = 20
 

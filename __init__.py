@@ -6,8 +6,8 @@
 
 """Bankcrisis Environment."""
 
-from .client import BankcrisisEnv
-from .models import BankcrisisAction, BankcrisisObservation
+from bankcrisis.client import BankcrisisEnv
+from bankcrisis.models import BankcrisisAction, BankcrisisObservation
 
 __all__ = [
     "BankcrisisAction",
