@@ -127,7 +127,7 @@ def parse_model_response(text: str) -> BankcrisisAction:
     return BankcrisisAction(rate_change=0, qe_amount=0, guidance="neutral")
 
 
-async def run_episode(env: BankcrisisEnvironment, client: OpenAI) -> tuple:
+async def run_episode(env: BankcrisisEnvironment, client: OpenAI, task_id: int, max_steps: int) -> tuple:
     """Run one episode, return (success, steps, score, rewards list)."""
     result = env.reset()   # sync reset – returns observation
     state = result.state   # dict with current values
@@ -202,14 +202,17 @@ async def main() -> None:
     # The environment randomly picks scenario. For deterministic task, you could modify reset().
     # For now, we rely on env.reset() to select scenario with correct task_id.
 
-    log_start(task=f"task{TASK_ID}", env=BENCHMARK, model=MODEL_NAME)
+    for task_id in [1, 2, 3]:
+        env   = BankcrisisEnvironment(task_level=task_id)
+        result = env.reset()
+        MAX_STEPS = result.state["max_steps"]  # read per-task step count
 
-    try:
-        success, steps_taken, final_score, rewards = await run_episode(env, client)
+        log_start(task=f"task{task_id}", env=BENCHMARK, model=MODEL_NAME)
+
+        success, steps_taken, final_score, rewards = await run_episode(
+            env, client, task_id, MAX_STEPS
+        )
         log_end(success=success, steps=steps_taken, score=final_score, rewards=rewards)
-    finally:
-        # No explicit close needed for direct instance (no container)
-        pass
 
 
 if __name__ == "__main__":
