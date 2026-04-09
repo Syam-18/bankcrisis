@@ -12,7 +12,8 @@ SCENARIOS = [
         "inflation": 5.5,       # High, needs rate hikes
         "unemployment": 4.0,    # Healthy
         "gdp_growth": 2.5,      # Strong
-        "stress": 0.2           # Low stress, markets are fine
+        "stress": 0.2,         # Low stress, markets are fine
+        "max_steps": 15,
     },
     {
         "task_id": 2,
@@ -21,7 +22,8 @@ SCENARIOS = [
         "inflation": 7.5,       # Very high
         "unemployment": 6.8,    # Uncomfortably high
         "gdp_growth": -0.5,     # Mild recession
-        "stress": 0.5           # Markets are nervous
+        "stress": 0.5,           # Markets are nervous
+        "max_steps": 15
     },
     {
         "task_id": 3,
@@ -30,6 +32,7 @@ SCENARIOS = [
         "inflation": 0.5,       # Dangerously low (deflation risk)
         "unemployment": 8.5,    # Severe job losses
         "gdp_growth": -3.0,     # Deep recession
-        "stress": 0.9           # Extreme market panic
+        "stress": 0.9,           # Extreme market panic
+        "max_steps": 20
     }
 ]

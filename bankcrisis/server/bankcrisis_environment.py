@@ -20,7 +20,6 @@ from .grading import grade
 
 from bankcrisis.models import BankcrisisAction, BankcrisisObservation, BankcrisisState
 
-MAX_STEPS = 20
 
 class BankcrisisEnvironment(Environment):
     """
@@ -73,7 +72,7 @@ class BankcrisisEnvironment(Environment):
             interest_rate=2.0,
             market_stress=scenario["stress"],
             step=0,
-            max_steps=MAX_STEPS,
+            max_steps=scenario["max_steps"],
             episode_id=str(uuid4())
         )
 

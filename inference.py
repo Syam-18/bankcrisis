@@ -14,10 +14,10 @@ import textwrap
 from typing import List, Optional
 
 from openai import OpenAI
-from server.scenarios import SCENARIOS
+from bankcrisis.server.scenarios import SCENARIOS
 
-from models import BankcrisisAction
-from server.bankcrisis_environment import BankcrisisEnvironment
+from bankcrisis.models import BankcrisisAction
+from bankcrisis.server.bankcrisis_environment import BankcrisisEnvironment
 
 # Environment configuration (use your actual values)
 API_KEY = os.getenv("HF_TOKEN")
@@ -28,32 +28,19 @@ MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
 # (1 = Inflation Control, 2 = Dual Mandate, 3 = Crisis Stabilisation)
 TASK_ID = int(os.getenv("BANKCRISIS_TASK", "1"))
 BENCHMARK = os.getenv("BANKCRISIS_BENCHMARK", "bankcrisis_env")
-MAX_STEPS = 15 if TASK_ID == 2 else 20 if TASK_ID == 3 else 10
-TEMPERATURE = 0.7
+MAX_STEPS = 15 if TASK_ID == 2 else 20 if TASK_ID == 3 else 15
+TEMPERATURE = 0.3
 MAX_TOKENS = 200
 
 # For final score normalisation (score is already 0‑1 from grader, no need to rescale)
 SUCCESS_SCORE_THRESHOLD = 0.8   # consider success if grader score >= 0.8
 SYSTEM_PROMPT = textwrap.dedent(
-    f"""
-    You are the Chair of the Central Bank. Your mandate is to stabilise the economy.
-    
-    ACTION SPACE:
-    - rate_change: -25, 0, or 25 (basis points)
-    - qe_amount: 0, 10, or 20 (billions)
-    - guidance: "hawkish", "neutral", or "dovish"
+    """
+    ...
+    RESPONSE FORMAT: You MUST respond with ONLY a JSON object, nothing else:
+    {"rate_change": <-25|0|25>, "qe_amount": <0|10|20>, "guidance": "<hawkish|neutral|dovish>"}
 
-    CRITICAL ENVIRONMENT DYNAMICS:
-    { "Task 1: Actions affect the economy instantly." if TASK_ID == 1 else
-      "Task 2: Actions have a 1-step transmission lag. Monitor 'Pending Policy Effects'." if TASK_ID == 2 else
-      "Task 3: Actions have a 2-step transmission lag. Anticipate future states carefully." }
-
-    Task {TASK_ID} objective:
-    { "Task 1: Bring inflation below 3.0% by the end of the episode." if TASK_ID == 1 else
-      "Task 2: Bring inflation below 3.0% AND unemployment below 5.5% simultaneously." if TASK_ID == 2 else
-      "Task 3: Bring market stress below 0.5, GDP growth above 0%, and inflation below 4.0%." }
-
-    Reply strictly with a JSON object exactly like: {{"rate_change": 25, "qe_amount": 0, "guidance": "hawkish"}}
+    No explanation. No prose. Only the JSON object.
     """
 ).strip()
 
@@ -94,7 +81,24 @@ def build_user_prompt(state: dict, step: int, last_reward: float) -> str:
 
         Choose your next policy action (rate_change, qe_amount, guidance).
         Based on the last reward you got change the parameters to attain a higher reward
-        """
+        DECISION RULES:
+
+        - Compare current state with previous step before choosing action
+        - If inflation, unemployment, or stress are not improving, you MUST change your action
+        - Never repeat the exact same action more than 2 times in a row
+        - If the same action is repeated and results do not improve, choose a DIFFERENT action
+
+        POLICY STYLE:
+
+        - Prefer gradual adjustments over large changes
+        - Maintain consistency, but adapt when progress stalls
+        - Account for delayed effects (policy lag)
+
+        IMPORTANT:
+
+        - Doing nothing repeatedly is NOT a valid strategy
+        - You must actively adjust policy when the economy is not improving
+            """
     ).strip()
 
 
@@ -131,7 +135,12 @@ async def run_episode(env: BankcrisisEnvironment, client: OpenAI) -> tuple:
     rewards = []
     done = False
 
-    for step in range(1, MAX_STEPS + 1):
+    # ← Maintain conversation history across steps
+    conversation_history = [
+        {"role": "system", "content": SYSTEM_PROMPT}
+    ]
+
+    for step in range(1, state['max_steps'] + 1):
         error = None 
         if done:
             break
@@ -139,24 +148,31 @@ async def run_episode(env: BankcrisisEnvironment, client: OpenAI) -> tuple:
         # Build prompt from current state
         user_prompt = build_user_prompt(state, step, rewards[-1] if rewards else 0.0)
 
+        # ← Add current user message to history
+        conversation_history.append({"role": "user", "content": user_prompt})
+
         # Get model action
         try:
             completion = client.chat.completions.create(
                 model=MODEL_NAME,
-                messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": user_prompt},
-                ],
+                messages=conversation_history,
                 temperature=TEMPERATURE,
                 max_tokens=MAX_TOKENS,
             )
             raw = completion.choices[0].message.content or ""
+
+            print(f"[RAW] step={step} output={raw[:200]}", flush=True)
+
             action = parse_model_response(raw)
             action_str = f"rate_change={action.rate_change}, qe_amount={action.qe_amount}, guidance={action.guidance}"
+
+            conversation_history.append({"role": "assistant", "content": raw})
+
         except Exception as e:
             action = BankcrisisAction(rate_change=0, qe_amount=0, guidance="neutral")
             action_str = "fallback_neutral"
             error = str(e)
+            conversation_history.append({"role": "assistant", "content": '{"rate_change": 0, "qe_amount": 0, "guidance": "neutral"}'})
 
         # Step environment
         obs = env.step(action)   # returns CrisisbankObservation

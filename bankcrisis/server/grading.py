@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Dict, Any
+MAX_STEPS = 20
 
 @dataclass
 class GradeResult:
@@ -43,6 +44,7 @@ def grade(task_id: int, final_state: Dict[str, Any]) -> GradeResult:
             score = 0.0
             success = False
             reason = f"Failed to control inflation at {inflation:.1f}%"
+        # print(inflation)
             
     elif task_id == 2:  # Dual Mandate (medium)
         # Target: inflation 2-3%, unemployment 4.5-5.5%
