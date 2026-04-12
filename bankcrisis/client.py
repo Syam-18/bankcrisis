@@ -84,6 +84,7 @@ class BankcrisisEnv(
             gdp_growth=payload.get("gdp_growth", 0.0),
             interest_rate=payload.get("interest_rate", 0.0),
             market_stress=payload.get("market_stress", 0.0),
+            goal=payload.get("goal", ''),
             step=payload.get("step", 0),
             max_steps=payload.get("max_steps", 20),  # Provide a default if missing
             episode_id=payload.get('episode_id', '')

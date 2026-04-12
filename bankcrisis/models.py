@@ -31,6 +31,7 @@ class BankcrisisState(State):
     step: int
     max_steps: int
     episode_id: str
+    goal: str
     
 
 

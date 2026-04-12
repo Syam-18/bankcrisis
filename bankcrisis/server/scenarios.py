@@ -8,7 +8,7 @@ SCENARIOS = [
     {
         "task_id": 1,
         "name": "Mild Overheating (Easy)",
-        "description": "Inflation is running hot. Bring it down below 3.0% without crashing the economy.",
+        "description": "Inflation is running hot. Bring it down below 3.5% without crashing the economy.",
         "inflation": 5.5,       # High, needs rate hikes
         "unemployment": 4.0,    # Healthy
         "gdp_growth": 2.5,      # Strong

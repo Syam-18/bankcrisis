@@ -28,7 +28,7 @@ def grade(task_id: int, final_state: Dict[str, Any]) -> GradeResult:
     
     # Base score calculation similar to _compute_reward but final evaluation
     if task_id == 1:  # Inflation Control (easy)
-        if inflation <= 2.5:
+        if inflation <= 3.5:
             score = 1.0
             success = True
             reason = f"Excellent! Inflation controlled at {inflation:.1f}%"

@@ -71,6 +71,7 @@ class BankcrisisEnvironment(Environment):
             gdp_growth=scenario["gdp_growth"],
             interest_rate=2.0,
             market_stress=scenario["stress"],
+            goal=scenario['description'],
             step=0,
             max_steps=scenario["max_steps"],
             episode_id=str(uuid4())
@@ -213,7 +214,8 @@ class BankcrisisEnvironment(Environment):
                 pending_str = " | ".join(pending)
 
         text = (
-            f"Month {s.step}:\n"
+            f"  Month {s.step}:\n"
+            f"- Goal {s.goal}: \n"
             f"- Inflation: {s.inflation:.2f}%\n"
             f"- Unemployment: {s.unemployment:.2f}%\n"
             f"- GDP Growth: {s.gdp_growth:.2f}%\n"
