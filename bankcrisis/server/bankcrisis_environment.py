@@ -17,6 +17,7 @@ from openenv.core.env_server.interfaces import Environment
 from openenv.core.env_server.types import State
 from .scenarios import SCENARIOS
 from .grading import grade
+import random
 
 from bankcrisis.models import BankcrisisAction, BankcrisisObservation, BankcrisisState
 
@@ -55,7 +56,7 @@ class BankcrisisEnvironment(Environment):
         self._policy_queue = []
 
     def reset(self):
-        scenario = next((s for s in SCENARIOS if s.get("task_id") == self._current_task_level), SCENARIOS[0])
+        scenario = next((s for s in SCENARIOS if s.get("task_id") == self._current_task_level), SCENARIOS(random.choice([0,1,2])))
         
         self._current_task_id = scenario["task_id"]
         self._last_rate_change = 0.0
