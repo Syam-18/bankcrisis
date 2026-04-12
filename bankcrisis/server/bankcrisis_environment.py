@@ -56,7 +56,7 @@ class BankcrisisEnvironment(Environment):
         self._policy_queue = []
 
     def reset(self):
-        scenario = next((s for s in SCENARIOS if s.get("task_id") == self._current_task_level), SCENARIOS(random.choice([0,1,2])))
+        scenario = next((s for s in SCENARIOS if s.get("task_id") == self._current_task_level), SCENARIOS[random.choice([0,1,2])])
         
         self._current_task_id = scenario["task_id"]
         self._last_rate_change = 0.0
