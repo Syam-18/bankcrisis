@@ -57,7 +57,7 @@ class BankcrisisEnvironment(Environment):
 
     def reset(self):
         if self._current_task_level is None:
-            self._current_task_level = random.randint(0, 2)
+            self._current_task_level = random.randint(1, 3)
 
         self._policy_lag_steps = self._current_task_level 
 
