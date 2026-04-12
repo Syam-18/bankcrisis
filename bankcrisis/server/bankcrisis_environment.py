@@ -46,6 +46,7 @@ class BankcrisisEnvironment(Environment):
     SUPPORTS_CONCURRENT_SESSIONS: bool = True
 
     def __init__(self, task_level: int = None):
+        self._task_level_override = task_level
         self._current_task_level = task_level
         self._state = None
         self._last_rate_change = 0.0
@@ -56,7 +57,9 @@ class BankcrisisEnvironment(Environment):
         self._policy_queue = []
 
     def reset(self):
-        if self._current_task_level is None:
+        if self._task_level_override is not None:
+            self._current_task_level = self._task_level_override  # always use override if set
+        else:
             self._current_task_level = random.randint(1, 3)
 
         self._policy_lag_steps = self._current_task_level 
