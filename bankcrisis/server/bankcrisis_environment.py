@@ -45,7 +45,9 @@ class BankcrisisEnvironment(Environment):
     # getting their own environment instance (when using factory mode in app.py).
     SUPPORTS_CONCURRENT_SESSIONS: bool = True
 
-    def __init__(self, task_level: int = 1):
+    def __init__(self, task_level: int = None):
+        if task_level is None:
+            task_level = random.randint(0, 2)
         self._current_task_level = task_level
         self._state = None
         self._last_rate_change = 0.0
