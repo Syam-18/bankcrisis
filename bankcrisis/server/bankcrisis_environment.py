@@ -46,19 +46,23 @@ class BankcrisisEnvironment(Environment):
     SUPPORTS_CONCURRENT_SESSIONS: bool = True
 
     def __init__(self, task_level: int = None):
-        if task_level is None:
-            task_level = random.randint(0, 2)
         self._current_task_level = task_level
         self._state = None
         self._last_rate_change = 0.0
         
         # Define how many steps it takes for policy to hit the economy
         # Easy = 0 (instant), Medium = 1 step delay, Hard = 2 step delay
-        self._policy_lag_steps = task_level - 1 
+        self._policy_lag_steps = None
         self._policy_queue = []
 
     def reset(self):
-        scenario = next((s for s in SCENARIOS if s.get("task_id") == self._current_task_level), SCENARIOS[random.choice([0,1,2])])
+        if self._current_task_level is None:
+            self._current_task_level = random.randint(0, 2)
+
+        self._policy_lag_steps = self._current_task_level 
+
+
+        scenario = next((s for s in SCENARIOS if s.get("task_id") == self._current_task_level), SCENARIOS[0])
         
         self._current_task_id = scenario["task_id"]
         self._last_rate_change = 0.0
