@@ -191,7 +191,11 @@ class BankcrisisEnvironment(Environment):
         final_score = max(0.0, min(1.0, base_score - stress_penalty - growth_penalty))
         return final_score
 
-    def state(self) -> BankcrisisState:
+    @property
+    def state(self):
+        return self._state
+
+    def get_state(self):
         return self._state
 
     def _observe(self, reward = 0.0, done = False, info = None) -> BankcrisisObservation:
