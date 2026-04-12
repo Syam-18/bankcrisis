@@ -10,13 +10,12 @@ from typing import Dict
 
 from openenv.core import EnvClient
 from openenv.core.client_types import StepResult
-from openenv.core.env_server.types import State
 
-from bankcrisis.models import BankcrisisAction, BankcrisisObservation, BankcrisisAction
+from bankcrisis.models import BankcrisisAction, BankcrisisObservation, BankcrisisState
 
 
 class BankcrisisEnv(
-    EnvClient[BankcrisisAction, BankcrisisObservation, State]
+    EnvClient[BankcrisisAction, BankcrisisObservation, BankcrisisState]
 ):
     """
     Client for the Bankcrisis Environment.
@@ -44,7 +43,7 @@ class BankcrisisEnv(
         ...     client.close()
     """
 
-    def _step_payload(self, action: CrisisbankAction) -> dict:
+    def _step_payload(self, action: BankcrisisAction) -> dict:
         """
         Convert a CrisisbankAction into a JSON-serializable dictionary.
         This dictionary will be sent to the server's step endpoint.
@@ -55,30 +54,31 @@ class BankcrisisEnv(
             "guidance": action.guidance,
         }
 
-    def _parse_result(self, payload: dict) -> StepResult[CrisisbankObservation]:
+    def _parse_result(self, payload: dict) -> StepResult[BankcrisisObservation]:
         """
         Parse the server's response into a StepResult containing an observation.
         The payload is the JSON object returned by the server after a step.
         """
         obs_data = payload.get("observation", {})
-        obs = CrisisbankObservation(
+        obs = BankcrisisObservation(
             text=obs_data.get("text", ""),
             state=obs_data.get("state", {}),
-            info=obs_data.get("info", {}) 
+            info=obs_data.get("info", {}) ,
+            done=obs_data.get("done", False),
+            info=obs_data.get("info", {})
         )
         return StepResult(
             observation=obs,
-            reward=obs.info.get("reward", 0.0),  # Extract reward from info
-            done=obs.info.get("done", False), 
+            reward=obs.reward,
+            done=obs.done,
         )
 
-    def _parse_state(self, payload: dict) -> CrisisbankState:
+    def _parse_state(self, payload: dict) -> BankcrisisState:
         """
         Parse the server's state response into a CrisisbankState object.
         This is used when calling the state() method of the client.
         """
-        return CrisisbankState(
-            
+        return BankcrisisState(            
             inflation=payload.get("inflation", 0.0),
             unemployment=payload.get("unemployment", 0.0),
             gdp_growth=payload.get("gdp_growth", 0.0),

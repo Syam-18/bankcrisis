@@ -80,6 +80,8 @@ class BankcrisisEnvironment(Environment):
 
 
     def step(self, action: BankcrisisAction) -> BankcrisisObservation: 
+        if self._state is None:
+            self.reset()
         s = self._state
 
         # 1. Calculate the raw effects of the CURRENT action
