@@ -84,6 +84,8 @@ class BankcrisisEnvironment(Environment):
         if self._state is None:
             self.reset()
         s = self._state
+        if(s.step == s.max_steps):
+            self.reset()
 
         # 1. Calculate the raw effects of the CURRENT action
         current_rate_effect = action.rate_change / 100.0
